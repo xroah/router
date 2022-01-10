@@ -22,5 +22,11 @@ export default {
             plugins: [terser()]
         }
     ],
-    plugins: [cjs(), resolve(), ts()]
+    plugins: [
+        cjs(),
+        resolve(),
+        ts({
+            tsconfig: "./tsconfig.json"
+        })
+    ]
 }
