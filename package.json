@@ -1,0 +1,38 @@
+{
+  "name": "router",
+  "version": "1.0.0",
+  "description": "Router for web components",
+  "main": "dist/index.js",
+  "dependencies": {
+    "path-to-regexp": "^6.2.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^21.0.1",
+    "@rollup/plugin-node-resolve": "^13.1.3",
+    "@rollup/plugin-typescript": "^8.3.0",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.63.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "tslib": "^2.3.1",
+    "typescript": "^4.5.4"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rimraf dist && rollup --config rollup.config.ts --configPlugin typescript"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xroah/router.git"
+  },
+  "keywords": [
+    "web",
+    "components",
+    "router"
+  ],
+  "author": "xroah",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xroah/router/issues"
+  },
+  "homepage": "https://github.com/xroah/router#readme"
+}
