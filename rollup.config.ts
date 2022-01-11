@@ -5,7 +5,7 @@ import {terser} from "rollup-plugin-terser"
 
 const outputCommons = {
     format: "umd",
-    name: "router"
+    name: "Router"
 }
 
 export default {
