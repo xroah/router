@@ -1,25 +1,27 @@
+import EventEmitter from "./utils/emitter"
+
+declare global {
+    interface HTMLElement {
+        $router: Router
+    }
+}
+
 interface RouteObject {
     path: string
     component: HTMLElement
     children?: RouteObject[]
 }
 
-declare global {
-    interface Window {
-        __routes__: RouteObject[]
-    }
-}
-
 interface Options {
     mode: "history" | "hash"
 }
 
-export default class Router {
+export default class Router extends EventEmitter {
     constructor(
-        public routes: RouteObject[],
+        public routes: RouteObject[] = [],
         private _options: Options = {mode: "hash"}
     ) {
-        window.__routes__ = routes
+        super()
 
         window.addEventListener(
             _options.mode === "hash" ? "hashchange" : "popstate",
@@ -30,8 +32,16 @@ export default class Router {
     handlePathChange = () => {
 
     }
+    
+    addRoute(route: RouteObject) {
+        this.routes.push(route)
+    }
 
-    push(path: string) {
+    addRoutes(routes: RouteObject[]) {
+        this.routes = this.routes.concat(routes)
+    }
+
+    push() {
         if (this._options.mode === "hash") {
 
         } else {
@@ -39,7 +49,7 @@ export default class Router {
         }
     }
 
-    go(n: number) {
+    go() {
 
     }
 
