@@ -8,7 +8,7 @@ interface Callback {
     (e: EventObject): void
 }
 
-export default class EventEmitter {
+export default class Emitter {
     private eventsMap: Map<string, Set<Callback>> = new Map()
 
     on(name: string, fn: Callback) {
