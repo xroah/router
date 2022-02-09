@@ -1,13 +1,13 @@
 export function findOutlet(el: HTMLElement) {
-    let p: any = null
+    let p: HTMLElement | null = el
 
-    while ((p = el.parentElement) && p !== document.body) {
+    while ((p = p.parentElement) && p !== document.body) {
         if (p.$router) {
             break
         }
     }
 
-    if (p === document.body && !p.$router) {
+    if (p === document.body) {
         p = null
     }
     

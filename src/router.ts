@@ -1,4 +1,3 @@
-import {ROUTER_INIT} from "./constants"
 import Emitter from "./utils/emitter"
 
 declare global {
@@ -6,7 +5,6 @@ declare global {
         $router: Router
     }
 }
-
 
 interface RouteObject {
     path: string
@@ -17,10 +15,11 @@ interface RouteObject {
 interface Options {
     mode: "history" | "hash"
     outlet?: string | HTMLElement
+    base?: string
 }
 
 export default class Router extends Emitter {
-    outlet: HTMLElement
+    outlet!: HTMLElement
 
     constructor(
         public routes: RouteObject[] = [],
@@ -40,30 +39,39 @@ export default class Router extends Emitter {
         } else if (_options.outlet instanceof HTMLElement) {
             outlet = _options.outlet
         }
-        
+
         if (!outlet) {
-            if (!_options.outlet) {
-                this.outlet = document.body
-            } else {
-                throw new Error("Can not find the outlet element")
-            }
+            throw new Error("Can not find the outlet element")
         } else {
+            if (outlet === document.body) {
+                throw new Error("The outlet can not be body")
+            }
+
             this.outlet = outlet
         }
 
-        
-        window.dispatchEvent(new CustomEvent(
-            ROUTER_INIT,
-            {
-                detail: this
+        if (this.outlet.$router) {
+            throw new Error("The outlet already has an router")
+        }
+
+        this.findView()
+    }
+
+    findView() {
+        const views = this.outlet.querySelectorAll("router-view");
+
+        (<NodeListOf<HTMLElement>>views).forEach(e => {
+            if (!e.$router) {
+                e.$router = this
             }
-        ))
+        })
+
     }
 
     handlePathChange = () => {
 
     }
-    
+
     addRoute(route: RouteObject) {
         this.routes.push(route)
     }
@@ -76,12 +84,12 @@ export default class Router extends Emitter {
         if (this._options.mode === "hash") {
 
         } else {
-            
+
         }
     }
-    
+
     replace() {
-        
+
     }
 
     go() {

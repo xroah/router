@@ -10,4 +10,6 @@ new Router([
         path: "/profile",
         component: "profile-page"
     }
-])
+], {
+    outlet: "#root"
+})
