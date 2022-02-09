@@ -13,31 +13,26 @@ interface RouteObject {
 }
 
 interface Options {
-    mode: "history" | "hash"
     outlet?: string | HTMLElement
     base?: string
 }
 
 export default class Router extends Emitter {
     outlet!: HTMLElement
+    current = "/"
 
     constructor(
         public routes: RouteObject[] = [],
-        private _options: Options = {mode: "hash"}
+        options: Options = {}
     ) {
         super()
 
-        window.addEventListener(
-            _options.mode === "hash" ? "hashchange" : "popstate",
-            this.handlePathChange
-        )
-
         let outlet: HTMLElement | null = null
 
-        if (typeof _options.outlet === "string") {
-            outlet = document.querySelector(_options.outlet)
-        } else if (_options.outlet instanceof HTMLElement) {
-            outlet = _options.outlet
+        if (typeof options.outlet === "string") {
+            outlet = document.querySelector(options.outlet)
+        } else if (options.outlet instanceof HTMLElement) {
+            outlet = options.outlet
         }
 
         if (!outlet) {
@@ -54,7 +49,18 @@ export default class Router extends Emitter {
             throw new Error("The outlet already has an router")
         }
 
+        this.init()
+    }
+
+    init() {
         this.findView()
+        window.addEventListener("hashchange", this.handleHashChange)
+
+        if (!location.hash) {
+            location.hash = "#/"
+        } else {
+            this.current = location.hash.substring(1)
+        }
     }
 
     findView() {
@@ -65,11 +71,10 @@ export default class Router extends Emitter {
                 e.$router = this
             }
         })
-
     }
 
-    handlePathChange = () => {
-
+    handleHashChange = () => {
+       
     }
 
     addRoute(route: RouteObject) {
@@ -81,11 +86,7 @@ export default class Router extends Emitter {
     }
 
     push() {
-        if (this._options.mode === "hash") {
-
-        } else {
-
-        }
+        
     }
 
     replace() {
