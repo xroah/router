@@ -2,19 +2,25 @@ import Router from "../router"
 import {findOutlet} from "../utils"
 
 export default class RouterView extends HTMLElement {
-    $router!: Router
     _router!: Router
 
-    connectedCallback() {
-        Object.defineProperty(this, "$router", {
-            get: () => {
-                return this._router
-            },
-            set: (router: Router) => {
-                this._router = router
-            }
-        })
+    get isView() {
+        return true
+    }
 
+    get $router() {
+        return this._router
+    }
+
+    set $router(router: Router) {
+        if (this._router) {
+            return
+        }
+
+        this._router = router
+    }
+
+    connectedCallback() {
         const outlet = findOutlet(this)
 
         if (outlet) {
@@ -23,6 +29,6 @@ export default class RouterView extends HTMLElement {
     }
 
     disconnectedCallback() {
-        
+
     }
 }

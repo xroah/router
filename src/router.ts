@@ -20,6 +20,7 @@ interface Options {
 export default class Router extends Emitter {
     outlet!: HTMLElement
     current = "/"
+    prev = ""
 
     constructor(
         public routes: RouteObject[] = [],
