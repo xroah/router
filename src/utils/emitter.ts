@@ -9,15 +9,15 @@ interface Callback {
 }
 
 export default class Emitter {
-    private eventsMap: Map<string, Set<Callback>> = new Map()
+    private _eventsMap: Map<string, Set<Callback>> = new Map()
 
     on(name: string, fn: Callback) {
-        let cbSet = this.eventsMap.get(name)
+        let cbSet = this._eventsMap.get(name)
 
         if (!cbSet) {
             cbSet = new Set<Callback>()
 
-            this.eventsMap.set(name, cbSet)
+            this._eventsMap.set(name, cbSet)
         }
 
         cbSet.add(fn)
@@ -36,17 +36,17 @@ export default class Emitter {
 
     off(name?: string, fn?: Callback) {
         if (name === undefined) {
-            this.eventsMap.clear()
+            this._eventsMap.clear()
         } else if (!fn) {
-            this.eventsMap.delete(name)
+            this._eventsMap.delete(name)
         } else {
-            const cbSet = this.eventsMap.get(name)
+            const cbSet = this._eventsMap.get(name)
 
             if (cbSet) {
                 cbSet.delete(fn)
 
                 if (!cbSet.size) {
-                    this.eventsMap.delete(name)
+                    this._eventsMap.delete(name)
                 }
             }
         }
@@ -58,7 +58,7 @@ export default class Emitter {
             timestamp: Date.now(),
             data
         }
-        const cbSet = this.eventsMap.get(name)
+        const cbSet = this._eventsMap.get(name)
 
         if (cbSet) {
             cbSet.forEach(f => f(e))
