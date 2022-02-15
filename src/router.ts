@@ -1,15 +1,17 @@
 import Emitter from "./utils/emitter"
-
-declare global {
-    interface HTMLElement {
-        $router: Router
-    }
-}
+import {compilePath} from "./utils"
 
 interface RouteObject {
     path: string
-    component: HTMLElement
+    component: string
     children?: RouteObject[]
+}
+
+interface RouterRecord {
+    regexp: RegExp,
+    path: string,
+    parent?: RouterRecord
+    component: string
 }
 
 interface Options {
@@ -18,9 +20,9 @@ interface Options {
 }
 
 export default class Router extends Emitter {
-    outlet!: HTMLElement
-    current = "/"
-    prev = ""
+    private _outlet!: HTMLElement
+    private _pathMap: Map<string, RouterRecord> = new Map()
+    private _pathList: string[] = []
 
     constructor(
         public routes: RouteObject[] = [],
@@ -43,10 +45,10 @@ export default class Router extends Emitter {
                 throw new Error("The outlet can not be body")
             }
 
-            this.outlet = outlet
+            this._outlet = outlet
         }
 
-        if (this.outlet.$router) {
+        if (this._outlet.$router) {
             throw new Error("The outlet already has an router")
         }
 
@@ -54,18 +56,38 @@ export default class Router extends Emitter {
     }
 
     init() {
+        this.createRouteMap(this.routes)
         this.findView()
         window.addEventListener("hashchange", this.handleHashChange)
 
         if (!location.hash) {
             location.hash = "#/"
-        } else {
-            this.current = location.hash.substring(1)
         }
     }
 
+    createRouteMap(routes: RouteObject[], parent?: RouterRecord) {
+        routes.forEach(r => {
+            if (!r.path) {
+                throw new Error("The route path is required")
+            }
+            
+            const parentPath = parent ? parent.path : ""
+            const record: RouterRecord = {
+                regexp: compilePath(r.path, parentPath),
+                path: r.path,
+                component: r.component
+            }
+
+            if (r.children) {
+                
+            }
+        })
+    }
+
     findView() {
-        const views = this.outlet.querySelectorAll("router-view");
+        const views = this._outlet.querySelectorAll(
+            "router-view, router-link"
+        );
 
         (<NodeListOf<HTMLElement>>views).forEach(e => {
             if (!e.$router) {
@@ -75,7 +97,6 @@ export default class Router extends Emitter {
     }
 
     handleHashChange = () => {
-       
     }
 
     addRoute(route: RouteObject) {
@@ -87,7 +108,7 @@ export default class Router extends Emitter {
     }
 
     push() {
-        
+
     }
 
     replace() {

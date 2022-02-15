@@ -2,9 +2,9 @@ import Router from "../router"
 import {findOutlet} from "../utils"
 
 export default class RouterView extends HTMLElement {
-    _router!: Router
+    private _router!: Router
 
-    get isView() {
+    get __isRouterView__() {
         return true
     }
 
