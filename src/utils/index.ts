@@ -58,3 +58,14 @@ export function getHash(url: string) {
 
     return a.hash
 }
+
+export function getBasePath(path: string) {
+    const re = /(.*\/)[^\/]*$/
+    const ret = re.exec(path)
+    
+    if (ret) {
+        return ret[1]
+    }
+
+    return ""
+}

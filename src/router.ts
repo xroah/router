@@ -1,6 +1,7 @@
 import Emitter from "./utils/emitter"
 import {
     compilePath,
+    getBasePath,
     getHash,
     normalizePath
 } from "./utils"
@@ -71,7 +72,7 @@ export default class Router extends Emitter {
         window.addEventListener("hashchange", this.handleHashChange)
 
         if (!location.hash) {
-            location.hash = "#/"
+            location.hash = "/"
         }
     }
 
@@ -179,23 +180,34 @@ export default class Router extends Emitter {
         this.routes = this.routes.concat(routes)
     }
 
-    push() {
+    handlePath(path: string) {
+        if (path[0] !== "/")  {
+            const base = getBasePath(location.hash.substring(1))
+            path = `${base}/${path}`
+        }
 
+        return path
     }
 
-    replace() {
-
+    push(path: string) {
+        path = this.handlePath(path)
+        location.hash = path
     }
 
-    go() {
+    replace(path: string) {
+        path = this.handlePath(path)
+        location.replace(`${location.pathname}#${path}`)
+    }
 
+    go(n: number) {
+        history.go(n)
     }
 
     forward() {
-
+        history.forward()
     }
 
     back() {
-
+        history.back()
     }
 }
