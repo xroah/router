@@ -1,3 +1,4 @@
+import {PATH_CHANGE} from "../constants"
 import Router, {RouterRecord} from "../router"
 import {findOutlet} from "../utils"
 import {EventObject} from "../utils/emitter"
@@ -20,7 +21,7 @@ export default class RouterView extends HTMLElement {
 
         this._router = router
 
-        router.on("path-change", this.handlePathChange)
+        router.on(PATH_CHANGE, this.handlePathChange)
     }
 
     connectedCallback() {
@@ -73,10 +74,7 @@ export default class RouterView extends HTMLElement {
 
     disconnectedCallback() {
         if (this.$router) {
-            this.$router.off(
-                "path-change",
-                this.handlePathChange
-            )
+            this.$router.off(PATH_CHANGE, this.handlePathChange)
         }
     }
 }

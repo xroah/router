@@ -1,5 +1,10 @@
 import Emitter from "./utils/emitter"
-import {compilePath, getHash, normalizePath} from "./utils"
+import {
+    compilePath,
+    getHash,
+    normalizePath
+} from "./utils"
+import {PATH_CHANGE} from "./constants"
 
 interface RouteObject {
     path: string
@@ -13,7 +18,7 @@ interface Path {
     normalizedPath: string
 }
 
-export interface RouterRecord extends Path{
+export interface RouterRecord extends Path {
     regexp: RegExp,
     parent?: RouterRecord
     component: string
@@ -75,11 +80,11 @@ export default class Router extends Emitter {
 
         routes.forEach(r => {
             const {path, strict} = r
-            
+
             if (!path) {
                 throw new Error("The route path is required")
             }
-            
+
             const parentPath = parent ? parent.path : ""
             const normalizedPath = normalizePath(r.path, parentPath, strict)
             const record: RouterRecord = {
@@ -99,12 +104,12 @@ export default class Router extends Emitter {
             })
             _pathMap.set(normalizedPath, record)
         })
-        
+
         // ensure * routes are always at the end
         for (let i = _pathList.length - 1; i >= 0; i--) {
             if (_pathList[i]!.path === "*") {
                 const tmp = _pathList.splice(i, 1)[0]
-                
+
                 _pathList.push(tmp!)
             }
         }
@@ -126,23 +131,23 @@ export default class Router extends Emitter {
 
     handleHashChange = (e: HashChangeEvent) => {
         const {newURL} = e
-        
+
         this.emitPathChange(newURL)
         console.log(e)
     }
 
     emitPathChange(url: string) {
         const matched = this.match(getHash(url).substring(1))
-        
-        this.emit("path-change", matched)
+
+        this.emit(PATH_CHANGE, matched)
     }
-    
+
     match(url: string) {
         let ret: RouterRecord[] = []
 
         for (let p of this._pathList) {
             const record = this._pathMap.get(p.normalizedPath)
-            
+
             if (record) {
                 if (url.match(record.regexp)) {
                     ret = this.getMatched(record)
@@ -150,14 +155,14 @@ export default class Router extends Emitter {
                 }
             }
         }
-        
+
         return ret
     }
 
     getMatched(matched?: RouterRecord) {
         const ret: RouterRecord[] = []
-        
-        while(matched) {
+
+        while (matched) {
             ret.push(matched)
 
             matched = matched.parent
@@ -179,7 +184,7 @@ export default class Router extends Emitter {
     }
 
     replace() {
-        
+
     }
 
     go() {
