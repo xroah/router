@@ -21,10 +21,7 @@ export function compilePath(
     parent?: string,
     strict?: boolean
 ) {
-    if (path === "*") {
-        path = "(.*)?"
-    }
-    
+    path = path.replace(/\*/g, "(.*)?")
     path = normalizePath(path, parent, strict)
 
     return pathToRegexp(path, [], {strict})
@@ -47,7 +44,7 @@ export function normalizePath(
     if (!strict && path.length > 1) {
         path = path.replace(/\/$/, "")
     }
-    
+
     if (parent) {
         path = `${parent}/${path}`
     }
