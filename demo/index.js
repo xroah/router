@@ -1,7 +1,7 @@
 import "./components/home.js"
 import "./components/profile.js"
 
-new Router([
+window.router = new Router([
     {
         path: "/",
         component: "home-page"

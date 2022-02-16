@@ -2,7 +2,7 @@ class Profile extends HTMLElement {
     constructor() {
         super()
         
-        const shadowRoot = this.attachShadow()
+        const shadowRoot = this.attachShadow({mode: "open"})
         shadowRoot.innerHTML = `
             <div>Profile page</div>
             <style>
@@ -11,6 +11,14 @@ class Profile extends HTMLElement {
                 }
             </style>
         `
+    }
+
+    connectedCallback() {
+        console.log("profile mounted")
+    }
+    
+    disconnectedCallback() {
+        console.log("profile unmounted")
     }
 }
 

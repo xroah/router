@@ -12,6 +12,14 @@ class Home extends HTMLElement {
             </style>
         `
     }
+    
+    connectedCallback() {
+        console.log("home mounted")
+    }
+    
+    disconnectedCallback() {
+        console.log("home unmounted")
+    }
 }
 
 customElements.define("home-page", Home)

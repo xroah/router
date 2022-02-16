@@ -1,15 +1,20 @@
 import Emitter from "./utils/emitter"
-import {compilePath} from "./utils"
+import {compilePath, getHash, normalizePath} from "./utils"
 
 interface RouteObject {
     path: string
     component: string
     children?: RouteObject[]
+    strict?: boolean
 }
 
-interface RouterRecord {
-    regexp: RegExp,
+interface Path {
     path: string,
+    normalizedPath: string
+}
+
+export interface RouterRecord extends Path{
+    regexp: RegExp,
     parent?: RouterRecord
     component: string
 }
@@ -22,7 +27,7 @@ interface Options {
 export default class Router extends Emitter {
     private _outlet!: HTMLElement
     private _pathMap: Map<string, RouterRecord> = new Map()
-    private _pathList: string[] = []
+    private _pathList: Path[] = []
 
     constructor(
         public routes: RouteObject[] = [],
@@ -66,22 +71,43 @@ export default class Router extends Emitter {
     }
 
     createRouteMap(routes: RouteObject[], parent?: RouterRecord) {
+        const {_pathList, _pathMap} = this
+
         routes.forEach(r => {
-            if (!r.path) {
+            const {path, strict} = r
+            
+            if (!path) {
                 throw new Error("The route path is required")
             }
             
             const parentPath = parent ? parent.path : ""
+            const normalizedPath = normalizePath(r.path, parentPath, strict)
             const record: RouterRecord = {
-                regexp: compilePath(r.path, parentPath),
-                path: r.path,
+                regexp: compilePath(path, parentPath, strict),
+                path: path,
+                normalizedPath,
                 component: r.component
             }
 
             if (r.children) {
-                
+                this.createRouteMap(routes, record)
             }
+
+            _pathList.push({
+                path,
+                normalizedPath
+            })
+            _pathMap.set(normalizedPath, record)
         })
+        
+        // ensure * routes are always at the end
+        for (let i = _pathList.length - 1; i >= 0; i--) {
+            if (_pathList[i]!.path === "*") {
+                const tmp = _pathList.splice(i, 1)[0]
+                
+                _pathList.push(tmp!)
+            }
+        }
     }
 
     findView() {
@@ -92,11 +118,52 @@ export default class Router extends Emitter {
         (<NodeListOf<HTMLElement>>views).forEach(e => {
             if (!e.$router) {
                 e.$router = this
+
+                this.emitPathChange(location.href)
             }
         })
     }
 
-    handleHashChange = () => {
+    handleHashChange = (e: HashChangeEvent) => {
+        const {newURL} = e
+        
+        this.emitPathChange(newURL)
+        console.log(e)
+    }
+
+    emitPathChange(url: string) {
+        const matched = this.match(getHash(url).substring(1))
+        
+        this.emit("path-change", matched)
+    }
+    
+    match(url: string) {
+        let ret: RouterRecord[] = []
+
+        for (let p of this._pathList) {
+            const record = this._pathMap.get(p.normalizedPath)
+            
+            if (record) {
+                if (url.match(record.regexp)) {
+                    ret = this.getMatched(record)
+                    break
+                }
+            }
+        }
+        
+        return ret
+    }
+
+    getMatched(matched?: RouterRecord) {
+        const ret: RouterRecord[] = []
+        
+        while(matched) {
+            ret.push(matched)
+
+            matched = matched.parent
+        }
+
+        return ret
     }
 
     addRoute(route: RouteObject) {
@@ -112,7 +179,7 @@ export default class Router extends Emitter {
     }
 
     replace() {
-
+        
     }
 
     go() {

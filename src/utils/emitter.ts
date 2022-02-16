@@ -1,4 +1,4 @@
-interface EventObject {
+export interface EventObject {
     type: string
     timestamp: number
     data?: any
