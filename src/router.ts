@@ -34,6 +34,7 @@ export default class Router extends Emitter {
     private _outlet!: HTMLElement
     private _pathMap: Map<string, RouterRecord> = new Map()
     private _pathList: Path[] = []
+    private _base = "/"
 
     constructor(
         public routes: RouteObject[] = [],
@@ -63,11 +64,21 @@ export default class Router extends Emitter {
             throw new Error("The outlet already has an router")
         }
 
+        if (options.base && options.base[0] !== "/") {
+            throw new Error("Base must starts with '/'")
+        }
+
         this.init()
     }
 
     init() {
-        this.createRouteMap(this.routes)
+        this.createRouteMap(
+            this.routes.map(r => {
+                r.path = `${this._base}/r.path`
+
+                return r
+            })
+        )
         this.findView()
         window.addEventListener("hashchange", this.handleHashChange)
 
@@ -181,7 +192,7 @@ export default class Router extends Emitter {
     }
 
     handlePath(path: string) {
-        if (path[0] !== "/")  {
+        if (path[0] !== "/") {
             const base = getBasePath(location.hash.substring(1))
             path = `${base}/${path}`
         }
