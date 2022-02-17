@@ -186,14 +186,6 @@ export default class Router extends Emitter {
         return ret
     }
 
-    addRoute(route: RouteObject) {
-        this.routes.push(route)
-    }
-
-    addRoutes(routes: RouteObject[]) {
-        this.routes = this.routes.concat(routes)
-    }
-
     handlePath(path: string) {
         if (path[0] !== "/") {
             const base = getBasePath(location.hash.substring(1))
@@ -210,6 +202,7 @@ export default class Router extends Emitter {
 
     replace(path: string) {
         path = this.handlePath(path)
+
         location.replace(`${location.pathname}#${path}`)
     }
 
