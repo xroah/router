@@ -1,5 +1,6 @@
 import Emitter from "./utils/emitter"
 import {
+    cleanPath,
     compilePath,
     getBasePath,
     getHash,
@@ -74,7 +75,7 @@ export default class Router extends Emitter {
     init() {
         this.createRouteMap(
             this.routes.map(r => {
-                r.path = `${this._base}/r.path`
+                r.path = cleanPath(`${this._base}/${r.path}`)
 
                 return r
             })
@@ -125,6 +126,8 @@ export default class Router extends Emitter {
                 _pathList.push(tmp!)
             }
         }
+        
+        console.log(this)
     }
 
     findView() {
@@ -135,10 +138,10 @@ export default class Router extends Emitter {
         (<NodeListOf<HTMLElement>>views).forEach(e => {
             if (!e.$router) {
                 e.$router = this
-
-                this.emitPathChange(location.href)
             }
         })
+
+        this.emitPathChange(location.href)
     }
 
     handleHashChange = (e: HashChangeEvent) => {

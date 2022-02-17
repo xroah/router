@@ -49,7 +49,7 @@ export function normalizePath(
         path = `${parent}/${path}`
     }
 
-    return path.replace(/\/+/g, "/")
+    return cleanPath(path)
 }
 
 export function getHash(url: string) {
@@ -68,4 +68,8 @@ export function getBasePath(path: string) {
     }
 
     return ""
+}
+
+export function cleanPath(path: string) {
+    return path.replace(/\/+/g, "/")
 }
